@@ -18,6 +18,7 @@ import { validationSchema } from './config/env.validation';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin.module';
 import { HomeModule } from './home.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -51,7 +52,9 @@ import { HomeModule } from './home.module';
     SupabaseModule,
     AuthModule,
     AdminModule,
+    AdminModule,
     HomeModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

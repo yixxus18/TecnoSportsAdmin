@@ -1,4 +1,11 @@
-import { Controller, Get, Render, UseGuards, Req, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Render,
+  UseGuards,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { SupabaseGuard } from './auth/supabase.guard';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -101,10 +108,12 @@ export class AdminController {
     const user = await this.checkAdminRole(req);
     const matchesResult = await this.matchesService.findAll();
     const teamsResult = await this.teamsService.findAll();
-    
-    const teamsMap = new Map(teamsResult.data.map(team => [team.id, team.name]));
 
-    const enrichedMatches = matchesResult.data.map(match => ({
+    const teamsMap = new Map(
+      teamsResult.data.map((team) => [team.id, team.name]),
+    );
+
+    const enrichedMatches = matchesResult.data.map((match) => ({
       ...match,
       homeTeamName: teamsMap.get(match.homeTeamId) || 'Unknown',
       awayTeamName: teamsMap.get(match.awayTeamId) || 'Unknown',
@@ -164,7 +173,7 @@ export class AdminController {
   login() {
     return {
       title: 'Login - TecnoSports Admin',
-      layout: false
+      layout: false,
     };
   }
 }

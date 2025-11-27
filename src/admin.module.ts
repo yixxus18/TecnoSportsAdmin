@@ -8,6 +8,8 @@ import { PoolsModule } from './api/pools/pools.module';
 import { MatchesModule } from './api/matches/matches.module';
 import { PredictionsModule } from './api/predictions/predictions.module';
 import { ConfederationsModule } from './api/confederations/confederations.module';
+import { FavoritesModule } from './api/favorites/favorites.module';
+import { NotificationsModule } from './api/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { ConfederationsModule } from './api/confederations/confederations.module
     MatchesModule,
     PredictionsModule,
     ConfederationsModule,
+    FavoritesModule,
+    NotificationsModule,
   ],
   controllers: [AdminController],
   providers: [],

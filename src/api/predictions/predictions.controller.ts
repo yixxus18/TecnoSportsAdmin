@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { PredictionsService } from './predictions.service';
 import { CreatePredictionDto } from './dto/create-prediction.dto';
 import { UpdatePredictionDto } from './dto/update-prediction.dto';
@@ -24,7 +32,10 @@ export class PredictionsController {
   }
 
   @Patch(':id')
-  async update(@Param('id') id: string, @Body() updatePredictionDto: UpdatePredictionDto) {
+  async update(
+    @Param('id') id: string,
+    @Body() updatePredictionDto: UpdatePredictionDto,
+  ) {
     return await this.predictionsService.update(+id, updatePredictionDto);
   }
 

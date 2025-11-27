@@ -19,7 +19,8 @@ export class TeamsService {
     const teamData = {
       ...createTeamDto,
       logoUrl: createTeamDto.logoUrl || undefined,
-      isActive: createTeamDto.isActive !== undefined ? createTeamDto.isActive : true,
+      isActive:
+        createTeamDto.isActive !== undefined ? createTeamDto.isActive : true,
     };
     return saved(table, await this.repo.save(teamData));
   }

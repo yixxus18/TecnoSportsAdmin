@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { PoolsService } from './pools.service';
 import { CreatePoolDto } from './dto/create-pool.dto';
 import { UpdatePoolDto } from './dto/update-pool.dto';
@@ -52,7 +60,7 @@ export class PoolsController {
   @Get(':poolId/participants/:userId')
   async getPoolParticipants(
     @Param('poolId') poolId: string,
-    @Param('userId') userId: string
+    @Param('userId') userId: string,
   ) {
     return await this.poolsService.getPoolParticipants(+poolId, +userId);
   }

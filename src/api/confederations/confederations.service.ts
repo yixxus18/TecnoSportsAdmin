@@ -11,7 +11,8 @@ const table = 'Confederation';
 @Injectable()
 export class ConfederationsService {
   constructor(
-    @InjectRepository(Confederation) private readonly repo: Repository<Confederation>,
+    @InjectRepository(Confederation)
+    private readonly repo: Repository<Confederation>,
   ) {}
 
   async create(createConfederationDto: CreateConfederationDto) {

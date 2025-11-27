@@ -1,7 +1,15 @@
 import { Prediction } from 'src/api/predictions/entities/prediction.entity';
 import { User } from 'src/api/users/entities/user.entity';
 import { EntityBase } from 'src/base.entity';
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 
 @Entity()
 export class Pool extends EntityBase {

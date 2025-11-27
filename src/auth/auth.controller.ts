@@ -30,7 +30,7 @@ export class AuthController {
           email: userProfile.email,
           name: userProfile.name,
           roleId: userProfile.roleId,
-        }
+        },
       };
     } catch (error) {
       console.log('User not in database, returning default profile');
@@ -40,9 +40,11 @@ export class AuthController {
         userProfile: {
           id: result.user.id,
           email: result.user.email,
-          name: result.user.user_metadata?.name || (result.user.email ? result.user.email.split('@')[0] : 'Usuario'),
+          name:
+            result.user.user_metadata?.name ||
+            (result.user.email ? result.user.email.split('@')[0] : 'Usuario'),
           roleId: 3, // Default role
-        }
+        },
       };
     }
   }

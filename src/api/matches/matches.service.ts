@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 import { Match } from './entities/match.entity';
@@ -18,21 +22,31 @@ export class MatchesService {
 
   async create(createMatchDto: CreateMatchDto) {
     // Validar que los equipos existen
-    const homeTeam = await this.teamRepo.findOne({ where: { id: createMatchDto.homeTeamId } });
+    const homeTeam = await this.teamRepo.findOne({
+      where: { id: createMatchDto.homeTeamId },
+    });
     if (!homeTeam) {
-      throw new BadRequestException(`Home team with id ${createMatchDto.homeTeamId} does not exist`);
+      throw new BadRequestException(
+        `Home team with id ${createMatchDto.homeTeamId} does not exist`,
+      );
     }
 
-    const awayTeam = await this.teamRepo.findOne({ where: { id: createMatchDto.awayTeamId } });
+    const awayTeam = await this.teamRepo.findOne({
+      where: { id: createMatchDto.awayTeamId },
+    });
     if (!awayTeam) {
-      throw new BadRequestException(`Away team with id ${createMatchDto.awayTeamId} does not exist`);
+      throw new BadRequestException(
+        `Away team with id ${createMatchDto.awayTeamId} does not exist`,
+      );
     }
 
     // Asignar valores por defecto si no se proporcionan
     const matchData = {
       ...createMatchDto,
-      scoreHome: createMatchDto.scoreHome !== undefined ? createMatchDto.scoreHome : 0,
-      scoreAway: createMatchDto.scoreAway !== undefined ? createMatchDto.scoreAway : 0,
+      scoreHome:
+        createMatchDto.scoreHome !== undefined ? createMatchDto.scoreHome : 0,
+      scoreAway:
+        createMatchDto.scoreAway !== undefined ? createMatchDto.scoreAway : 0,
       status: createMatchDto.status || 'pending',
     };
     return saved(table, await this.repo.save(matchData));

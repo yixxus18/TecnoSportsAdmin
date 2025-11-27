@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  NotFoundException,
+} from '@nestjs/common';
 import { LeaderboardService } from './leaderboard.service';
 import { env } from 'env';
 
@@ -51,13 +60,19 @@ export class LeaderboardController {
   }
 
   @Post('update/prediction/:predictionId')
-  async updateLeaderboardAfterPrediction(@Param('predictionId') predictionId: string) {
-    return await this.leaderboardService.updateLeaderboardAfterPrediction(+predictionId);
+  async updateLeaderboardAfterPrediction(
+    @Param('predictionId') predictionId: string,
+  ) {
+    return await this.leaderboardService.updateLeaderboardAfterPrediction(
+      +predictionId,
+    );
   }
 
   @Post('update/match/:matchId')
   async updateLeaderboardAfterMatchResult(@Param('matchId') matchId: string) {
-    return await this.leaderboardService.updateLeaderboardAfterMatchResult(+matchId);
+    return await this.leaderboardService.updateLeaderboardAfterMatchResult(
+      +matchId,
+    );
   }
 
   @Patch(':id')

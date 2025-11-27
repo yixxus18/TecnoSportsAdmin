@@ -12,9 +12,11 @@ import { Match } from '../matches/entities/match.entity';
 @Injectable()
 export class LeaderboardService {
   constructor(
-    @InjectModel(Leaderboard.name) private leaderboardModel: Model<LeaderboardDocument>,
+    @InjectModel(Leaderboard.name)
+    private leaderboardModel: Model<LeaderboardDocument>,
     @InjectRepository(Pool) private poolRepo: Repository<Pool>,
-    @InjectRepository(Prediction) private predictionRepo: Repository<Prediction>,
+    @InjectRepository(Prediction)
+    private predictionRepo: Repository<Prediction>,
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(Match) private matchRepo: Repository<Match>,
   ) {}
@@ -37,7 +39,9 @@ export class LeaderboardService {
   }
 
   async update(id: string, updateLeaderboardDto: any) {
-    return this.leaderboardModel.findByIdAndUpdate(id, updateLeaderboardDto, { new: true }).exec();
+    return this.leaderboardModel
+      .findByIdAndUpdate(id, updateLeaderboardDto, { new: true })
+      .exec();
   }
 
   async remove(id: string) {
@@ -55,7 +59,7 @@ export class LeaderboardService {
     // Verificar que la pool existe
     const pool = await this.poolRepo.findOne({
       where: { id: poolId },
-      relations: ['participants']
+      relations: ['participants'],
     });
 
     if (!pool) {
@@ -65,18 +69,21 @@ export class LeaderboardService {
     // Obtener todas las predicciones de la pool con relaciones
     const predictions = await this.predictionRepo.find({
       where: { pool: { id: poolId } },
-      relations: ['user', 'match']
+      relations: ['user', 'match'],
     });
 
     // Calcular puntos por usuario
-    const userPoints = new Map<number, { user: User; points: number; predictions: number }>();
+    const userPoints = new Map<
+      number,
+      { user: User; points: number; predictions: number }
+    >();
 
     // Inicializar todos los participantes con 0 puntos
-    pool.participants.forEach(participant => {
+    pool.participants.forEach((participant) => {
       userPoints.set(participant.id, {
         user: participant,
         points: 0,
-        predictions: 0
+        predictions: 0,
       });
     });
 
@@ -89,16 +96,23 @@ export class LeaderboardService {
         // Solo calcular puntos si el partido ya terminó
         if (prediction.match.status === 'finished') {
           // Determinar el resultado real del partido
-          const actualResult = prediction.match.scoreHome > prediction.match.scoreAway ? 'home' :
-                              prediction.match.scoreHome < prediction.match.scoreAway ? 'away' : 'draw';
+          const actualResult =
+            prediction.match.scoreHome > prediction.match.scoreAway
+              ? 'home'
+              : prediction.match.scoreHome < prediction.match.scoreAway
+                ? 'away'
+                : 'draw';
 
           // Lógica de puntos: 3 puntos por acierto exacto, 1 por resultado correcto
           if (prediction.prediction === actualResult) {
             userData.points += 3; // Acierto exacto
           } else if (
-            (prediction.prediction === 'home' && prediction.match.scoreHome > prediction.match.scoreAway) ||
-            (prediction.prediction === 'away' && prediction.match.scoreHome < prediction.match.scoreAway) ||
-            (prediction.prediction === 'draw' && prediction.match.scoreHome === prediction.match.scoreAway)
+            (prediction.prediction === 'home' &&
+              prediction.match.scoreHome > prediction.match.scoreAway) ||
+            (prediction.prediction === 'away' &&
+              prediction.match.scoreHome < prediction.match.scoreAway) ||
+            (prediction.prediction === 'draw' &&
+              prediction.match.scoreHome === prediction.match.scoreAway)
           ) {
             userData.points += 1; // Resultado correcto
           }
@@ -114,7 +128,7 @@ export class LeaderboardService {
         email: userData.user.email,
         points: userData.points,
         predictions: userData.predictions,
-        position: 0 // Se calculará después del sort
+        position: 0, // Se calculará después del sort
       }))
       .sort((a, b) => b.points - a.points || b.predictions - a.predictions);
 
@@ -127,22 +141,24 @@ export class LeaderboardService {
     const leaderboardData = {
       poolId,
       positions,
-      updated_at: new Date()
+      updated_at: new Date(),
     };
 
-    const existingLeaderboard = await this.leaderboardModel.findOne({ poolId }).exec();
+    const existingLeaderboard = await this.leaderboardModel
+      .findOne({ poolId })
+      .exec();
 
     if (existingLeaderboard) {
-      await this.leaderboardModel.findByIdAndUpdate(
-        existingLeaderboard._id,
-        leaderboardData,
-        { new: true }
-      ).exec();
+      await this.leaderboardModel
+        .findByIdAndUpdate(existingLeaderboard._id, leaderboardData, {
+          new: true,
+        })
+        .exec();
       return this.leaderboardModel.findById(existingLeaderboard._id).exec();
     } else {
       const newLeaderboard = new this.leaderboardModel({
         ...leaderboardData,
-        created_at: new Date()
+        created_at: new Date(),
       });
       return newLeaderboard.save();
     }
@@ -162,7 +178,7 @@ export class LeaderboardService {
     // Obtener información de la pool
     const pool = await this.poolRepo.findOne({
       where: { id: poolId },
-      relations: ['creator']
+      relations: ['creator'],
     });
 
     if (!pool) {
@@ -176,14 +192,14 @@ export class LeaderboardService {
         description: pool.description,
         creator: {
           id: pool.creator.id,
-          name: pool.creator.name
+          name: pool.creator.name,
         },
-        totalParticipants: leaderboard.positions.length
+        totalParticipants: leaderboard.positions.length,
       },
       leaderboard: {
         lastUpdated: leaderboard.updated_at,
-        positions: leaderboard.positions
-      }
+        positions: leaderboard.positions,
+      },
     } as any;
   }
 
@@ -191,7 +207,7 @@ export class LeaderboardService {
     // Obtener la predicción con relaciones
     const prediction = await this.predictionRepo.findOne({
       where: { id: predictionId },
-      relations: ['pool']
+      relations: ['pool'],
     });
 
     if (prediction && prediction.pool) {
@@ -204,11 +220,13 @@ export class LeaderboardService {
     // Obtener todas las predicciones del partido
     const predictions = await this.predictionRepo.find({
       where: { match: { id: matchId } },
-      relations: ['pool']
+      relations: ['pool'],
     });
 
     // Obtener pools únicas
-    const poolIds = [...new Set(predictions.map(p => p.pool?.id).filter(id => id))];
+    const poolIds = [
+      ...new Set(predictions.map((p) => p.pool?.id).filter((id) => id)),
+    ];
 
     // Recalcular leaderboard para cada pool
     for (const poolId of poolIds) {

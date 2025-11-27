@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreatePredictionDto } from './dto/create-prediction.dto';
 import { UpdatePredictionDto } from './dto/update-prediction.dto';
 import { Prediction } from './entities/prediction.entity';
@@ -38,16 +42,20 @@ export class PredictionsService {
     // 3. Verificar que la pool existe
     const pool = await this.poolRepo.findOne({
       where: { id: poolId },
-      relations: ['participants']
+      relations: ['participants'],
     });
     if (!pool) {
       throw new BadRequestException(`Pool with id ${poolId} does not exist`);
     }
 
     // 4. Verificar que el usuario es participante de la pool
-    const isParticipant = pool.participants.some(participant => participant.id === userId);
+    const isParticipant = pool.participants.some(
+      (participant) => participant.id === userId,
+    );
     if (!isParticipant) {
-      throw new BadRequestException(`User with id ${userId} is not a participant in pool ${poolId}`);
+      throw new BadRequestException(
+        `User with id ${userId} is not a participant in pool ${poolId}`,
+      );
     }
 
     // 5. Verificar que no existe una predicción previa para este usuario/partido/pool
@@ -55,17 +63,21 @@ export class PredictionsService {
       where: {
         user: { id: userId },
         match: { id: matchId },
-        pool: { id: poolId }
-      }
+        pool: { id: poolId },
+      },
     });
     if (existingPrediction) {
-      throw new BadRequestException(`User has already made a prediction for this match in this pool`);
+      throw new BadRequestException(
+        `User has already made a prediction for this match in this pool`,
+      );
     }
 
     // 6. Verificar que el partido no ha empezado (opcional - dependiendo de las reglas)
     const now = new Date();
     if (match.matchDate <= now && match.status !== 'pending') {
-      throw new BadRequestException(`Cannot make prediction for a match that has already started or finished`);
+      throw new BadRequestException(
+        `Cannot make prediction for a match that has already started or finished`,
+      );
     }
 
     // Crear la predicción
@@ -74,14 +86,14 @@ export class PredictionsService {
       points: 0, // Inicialmente 0 puntos
       user,
       match,
-      pool
+      pool,
     });
 
     console.log('🔍 DEBUG: Creating prediction:', {
       userId,
       matchId,
       poolId,
-      prediction
+      prediction,
     });
 
     return saved(table, await this.repo.save(newPrediction));
@@ -142,16 +154,16 @@ export class PredictionsService {
     const predictions = await this.repo.find({
       where: { user: { id: userId } },
       relations: ['user', 'match', 'pool'],
-      order: { created_at: 'DESC' }
+      order: { created_at: 'DESC' },
     });
 
     return found(`Predictions for user ${user.name}`, {
       user: {
         id: user.id,
         name: user.name,
-        email: user.email
+        email: user.email,
       },
-      predictions: predictions.map(prediction => ({
+      predictions: predictions.map((prediction) => ({
         id: prediction.id,
         prediction: prediction.prediction,
         points: prediction.points,
@@ -162,25 +174,29 @@ export class PredictionsService {
           weekNumber: prediction.match.weekNumber,
           matchDate: prediction.match.matchDate,
           status: prediction.match.status,
-          homeTeam: prediction.match.homeTeam ? {
-            id: prediction.match.homeTeam.id,
-            name: prediction.match.homeTeam.name
-          } : null,
-          awayTeam: prediction.match.awayTeam ? {
-            id: prediction.match.awayTeam.id,
-            name: prediction.match.awayTeam.name
-          } : null,
+          homeTeam: prediction.match.homeTeam
+            ? {
+                id: prediction.match.homeTeam.id,
+                name: prediction.match.homeTeam.name,
+              }
+            : null,
+          awayTeam: prediction.match.awayTeam
+            ? {
+                id: prediction.match.awayTeam.id,
+                name: prediction.match.awayTeam.name,
+              }
+            : null,
           scoreHome: prediction.match.scoreHome,
-          scoreAway: prediction.match.scoreAway
+          scoreAway: prediction.match.scoreAway,
         },
         pool: {
           id: prediction.pool.id,
           name: prediction.pool.name,
-          invitationCode: prediction.pool.invitationCode
-        }
+          invitationCode: prediction.pool.invitationCode,
+        },
       })),
       totalPredictions: predictions.length,
-      totalPoints: predictions.reduce((sum, pred) => sum + pred.points, 0)
+      totalPoints: predictions.reduce((sum, pred) => sum + pred.points, 0),
     });
   }
 
@@ -196,17 +212,17 @@ export class PredictionsService {
       where: { pool: { id: poolId } },
       relations: ['user', 'match'],
       order: {
-        created_at: 'ASC'
-      }
+        created_at: 'ASC',
+      },
     });
 
     return found(`Predictions for pool ${pool.name}`, {
       pool: {
         id: pool.id,
         name: pool.name,
-        invitationCode: pool.invitationCode
+        invitationCode: pool.invitationCode,
       },
-      predictions: predictions.map(prediction => ({
+      predictions: predictions.map((prediction) => ({
         id: prediction.id,
         prediction: prediction.prediction,
         points: prediction.points,
@@ -214,26 +230,30 @@ export class PredictionsService {
         user: {
           id: prediction.user.id,
           name: prediction.user.name,
-          email: prediction.user.email
+          email: prediction.user.email,
         },
         match: {
           id: prediction.match.id,
           weekNumber: prediction.match.weekNumber,
           matchDate: prediction.match.matchDate,
           status: prediction.match.status,
-          homeTeam: prediction.match.homeTeam ? {
-            id: prediction.match.homeTeam.id,
-            name: prediction.match.homeTeam.name
-          } : null,
-          awayTeam: prediction.match.awayTeam ? {
-            id: prediction.match.awayTeam.id,
-            name: prediction.match.awayTeam.name
-          } : null,
+          homeTeam: prediction.match.homeTeam
+            ? {
+                id: prediction.match.homeTeam.id,
+                name: prediction.match.homeTeam.name,
+              }
+            : null,
+          awayTeam: prediction.match.awayTeam
+            ? {
+                id: prediction.match.awayTeam.id,
+                name: prediction.match.awayTeam.name,
+              }
+            : null,
           scoreHome: prediction.match.scoreHome,
-          scoreAway: prediction.match.scoreAway
-        }
+          scoreAway: prediction.match.scoreAway,
+        },
       })),
-      totalPredictions: predictions.length
+      totalPredictions: predictions.length,
     });
   }
 
@@ -241,7 +261,7 @@ export class PredictionsService {
     // Verificar que el partido existe
     const match = await this.matchRepo.findOne({
       where: { id: matchId },
-      relations: ['homeTeam', 'awayTeam']
+      relations: ['homeTeam', 'awayTeam'],
     });
     if (!match) {
       throw new NotFoundException(`Match with id ${matchId} not found`);
@@ -251,7 +271,7 @@ export class PredictionsService {
     const predictions = await this.repo.find({
       where: { match: { id: matchId } },
       relations: ['user', 'pool'],
-      order: { created_at: 'ASC' }
+      order: { created_at: 'ASC' },
     });
 
     return found(`Predictions for match ${matchId}`, {
@@ -260,18 +280,22 @@ export class PredictionsService {
         weekNumber: match.weekNumber,
         matchDate: match.matchDate,
         status: match.status,
-        homeTeam: match.homeTeam ? {
-          id: match.homeTeam.id,
-          name: match.homeTeam.name
-        } : null,
-        awayTeam: match.awayTeam ? {
-          id: match.awayTeam.id,
-          name: match.awayTeam.name
-        } : null,
+        homeTeam: match.homeTeam
+          ? {
+              id: match.homeTeam.id,
+              name: match.homeTeam.name,
+            }
+          : null,
+        awayTeam: match.awayTeam
+          ? {
+              id: match.awayTeam.id,
+              name: match.awayTeam.name,
+            }
+          : null,
         scoreHome: match.scoreHome,
-        scoreAway: match.scoreAway
+        scoreAway: match.scoreAway,
       },
-      predictions: predictions.map(prediction => ({
+      predictions: predictions.map((prediction) => ({
         id: prediction.id,
         prediction: prediction.prediction,
         points: prediction.points,
@@ -279,20 +303,20 @@ export class PredictionsService {
         user: {
           id: prediction.user.id,
           name: prediction.user.name,
-          email: prediction.user.email
+          email: prediction.user.email,
         },
         pool: {
           id: prediction.pool.id,
           name: prediction.pool.name,
-          invitationCode: prediction.pool.invitationCode
-        }
+          invitationCode: prediction.pool.invitationCode,
+        },
       })),
       totalPredictions: predictions.length,
       predictionStats: {
-        home: predictions.filter(p => p.prediction === 'home').length,
-        draw: predictions.filter(p => p.prediction === 'draw').length,
-        away: predictions.filter(p => p.prediction === 'away').length
-      }
+        home: predictions.filter((p) => p.prediction === 'home').length,
+        draw: predictions.filter((p) => p.prediction === 'draw').length,
+        away: predictions.filter((p) => p.prediction === 'away').length,
+      },
     });
   }
 }
