@@ -256,7 +256,7 @@
                         }
 
                     } else {
-                        const errorMsg = data.error?.message || 'Credenciales inválidas';
+                        const errorMsg = data.message || data.error?.message || (typeof data.error === 'string' ? data.error : null) || 'Credenciales inválidas';
                         showError(errorMsg);
                     }
 
