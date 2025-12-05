@@ -19,6 +19,7 @@ import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin.module';
 import { HomeModule } from './home.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { NotificationSubscriptionModule } from './notification-subscription/notification-subscription.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         },
       },
     }),
+    NotificationSubscriptionModule,
     UsersModule,
     RolesModule,
     ConfederationsModule,

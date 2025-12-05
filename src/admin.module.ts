@@ -9,7 +9,6 @@ import { MatchesModule } from './api/matches/matches.module';
 import { PredictionsModule } from './api/predictions/predictions.module';
 import { ConfederationsModule } from './api/confederations/confederations.module';
 import { FavoritesModule } from './api/favorites/favorites.module';
-import { NotificationsModule } from './api/notifications/notifications.module';
 import { NotificationSubscriptionModule } from './notification-subscription/notification-subscription.module';
 
 @Module({
@@ -22,7 +21,6 @@ import { NotificationSubscriptionModule } from './notification-subscription/noti
     PredictionsModule,
     ConfederationsModule,
     FavoritesModule,
-    NotificationsModule,
     NotificationSubscriptionModule,
   ],
   controllers: [AdminController],
