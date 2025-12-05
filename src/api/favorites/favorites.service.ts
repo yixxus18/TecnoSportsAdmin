@@ -16,10 +16,10 @@ export class FavoritesService {
   ) {}
 
   async create(createFavoriteDto: CreateFavoriteDto) {
-    const { userId, matchId } = createFavoriteDto;
+    const { matchId } = createFavoriteDto;
 
     const existingFavorite = await this.favoriteRepository.findOne({
-      where: { userId, matchId },
+      where: { matchId },
     });
 
     if (existingFavorite) {
