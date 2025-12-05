@@ -33,7 +33,7 @@ import { NotificationSubscriptionModule } from './notification-subscription/noti
       type: 'postgres',
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
-      synchronize: false, // 🔒 Desactivado - No crear tablas automáticamente
+      synchronize: true, // 🔒 Desactivado - No crear tablas automáticamente
       dropSchema: false, // 🔒 Desactivado - No eliminar tablas
       logging: false, // 🔕 Sin logs detallados
       extra: {
