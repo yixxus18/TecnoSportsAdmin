@@ -15,4 +15,9 @@ export const env = {
   mongodb: {
     url: process.env.MONGO_URL,
   },
+
+  vapid: {
+    public_key: process.env.VAPID_PUBLIC_KEY,
+    private_key: process.env.VAPID_PRIVATE_KEY,
+  },
 };

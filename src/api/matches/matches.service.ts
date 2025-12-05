@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
@@ -10,14 +12,18 @@ import { Team } from '../teams/entities/team.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { found, notFound, saved, updated } from 'src/Utils/Responses';
+import { NotificationsService } from 'src/notification-subscription/notification-subscription.service';
 
 const table = 'Match';
 
 @Injectable()
 export class MatchesService {
+  private readonly logger = new Logger(MatchesService.name);
+
   constructor(
     @InjectRepository(Match) private readonly repo: Repository<Match>,
     @InjectRepository(Team) private readonly teamRepo: Repository<Team>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async create(createMatchDto: CreateMatchDto) {
@@ -49,6 +55,19 @@ export class MatchesService {
         createMatchDto.scoreAway !== undefined ? createMatchDto.scoreAway : 0,
       status: createMatchDto.status || 'pending',
     };
+
+    const notificationPayload = {
+      title: '⚽ ¡NUEVO ENCUENTRO!',
+      body: `¡Se ha programado el partido ${homeTeam.name} vs ${awayTeam.name}!`,
+    };
+    this.notificationsService
+      .sendBroadcastNotification(notificationPayload)
+      .catch((error) =>
+        this.logger.error(
+          'Error al iniciar broadcast de notificaciones:',
+          error,
+        ),
+      );
     return saved(table, await this.repo.save(matchData));
   }
 
