@@ -56,9 +56,9 @@ export class NotificationsService {
     const upcomingMatches = await this.matchRepository.find({
       where: {
         matchDate: Between(windowStart, windowEnd),
-        status: 'pending', // Only pending matches
+        status: 'pending', // Only matches that haven't been notified yet
       },
-      relations: ['homeTeam', 'awayTeam'],
+      // Removed relations to avoid type mismatch issues
     });
 
     this.logger.log(`[CRON-UPCOMING] Found ${upcomingMatches.length} upcoming matches`);
@@ -92,7 +92,7 @@ export class NotificationsService {
         matchDate: Between(windowStart, windowEnd),
         status: 'pending', // Only pending matches
       },
-      relations: ['homeTeam', 'awayTeam'],
+      // Removed relations to avoid type mismatch issues
     });
 
     this.logger.log(`[CRON-STARTING] Found ${startingMatches.length} starting matches`);
