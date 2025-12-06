@@ -6,7 +6,7 @@ import {
   HttpCode,
   Post,
   Request,
-  UseGuards,
+  Logger,
 } from '@nestjs/common';
 import { NotificationsService } from './notification-subscription.service';
 import { CreateSubscriptionDto } from './dto/create-subscription';
@@ -14,6 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Controller('notification-subscription')
 export class NotificationSubscriptionController {
+  private readonly logger = new Logger(NotificationSubscriptionController.name);
   constructor(private readonly notificationsService: NotificationsService) {}
 
   // 2. LA RUTA DEBE SER POST 'subscribe'
@@ -25,6 +26,8 @@ export class NotificationSubscriptionController {
     @Body() subscriptionDto: CreateSubscriptionDto,
     @Request() req,
   ) {
+    this.logger.log('📢 ¡PETICIÓN RECIBIDA EN /subscribe!');
+    this.logger.log(`Datos recibidos: ${JSON.stringify(subscriptionDto)}`);
     // const userId = req.user.id;
     const userId = 1;
 

@@ -60,32 +60,37 @@ export class NotificationsService {
     url?: string;
   }) {
     const subscriptions = await this.subsRepo.find();
+    this.logger.log(
+      `📨 Intentando enviar notificación a ${subscriptions.length} suscripciones.`,
+    );
+
+    if (subscriptions.length === 0) {
+      this.logger.warn(
+        '⚠️ NO hay suscripciones en la base de datos. Nadie recibirá nada.',
+      );
+      return;
+    }
+
     const notificationPayload = JSON.stringify(payload);
 
-    // Mapeamos las suscripciones a promesas de envío
     const promises = subscriptions.map(async (sub) => {
       try {
         await webPush.sendNotification(
           {
             endpoint: sub.endpoint,
-            // Reconstruimos el objeto de llaves
             keys: { p256dh: sub.p256dh, auth: sub.auth },
           },
           notificationPayload,
         );
+        this.logger.log(`✅ Notificación enviada exitosamente a ID: ${sub.id}`);
       } catch (error) {
-        this.logger.error(
-          `Error al enviar a ${sub.id}. Status: ${error.statusCode}`,
-        );
-        // Limpia suscripciones obsoletas (código 410 Gone o 404 Not Found)
+        this.logger.error(`❌ Error enviando a ${sub.id}:`, error);
         if (error.statusCode === 410 || error.statusCode === 404) {
           await this.subsRepo.delete(sub.id);
-          this.logger.warn(`Suscripción obsoleta borrada: ${sub.id}`);
         }
       }
     });
 
-    // Usamos allSettled para que el proceso no se detenga si una falla
     await Promise.allSettled(promises);
   }
 }
