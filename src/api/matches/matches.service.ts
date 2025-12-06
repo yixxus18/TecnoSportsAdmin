@@ -70,11 +70,28 @@ export class MatchesService {
   }
 
   async findAll() {
-    return found(`${table}s`, await this.repo.find());
+    return found(
+      `${table}es`,
+      await this.repo.find({
+        relations: {
+          homeTeam: { confederation: true },
+          awayTeam: { confederation: true },
+          predictions: { user: true },
+        },
+      }),
+    );
   }
 
   async findOne(id: number) {
-    const match = await this.repo.findOne({ where: { id } });
+    const match = await this.repo.findOne({
+      where: { id },
+      relations: {
+        homeTeam: { confederation: true },
+        awayTeam: { confederation: true },
+        predictions: { user: true },
+      },
+    });
+
     if (!match) {
       throw new NotFoundException(notFound(table, id));
     }
@@ -82,7 +99,13 @@ export class MatchesService {
   }
 
   async update(id: number, updateMatchDto: UpdateMatchDto) {
-    const match = await this.repo.findOne({ where: { id } });
+    const match = await this.repo.findOne({
+      where: { id },
+      relations: {
+        homeTeam: { confederation: true },
+        awayTeam: { confederation: true },
+      },
+    });
 
     if (!match) {
       throw new NotFoundException(notFound(table, id));
@@ -91,9 +114,6 @@ export class MatchesService {
     Object.assign(match, updateMatchDto);
 
     return updated(table, await this.repo.save(match));
-
-    // Actualizar leaderboards después de actualizar resultado del partido
-    // await this.updateLeaderboardsAfterMatchUpdate(match.id);
   }
 
   async remove(id: number) {

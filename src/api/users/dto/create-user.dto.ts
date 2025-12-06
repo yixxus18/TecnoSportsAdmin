@@ -5,6 +5,7 @@ import {
   Matches,
   MinLength,
 } from 'class-validator';
+import { IsUnique } from 'src/validations/unique.constraint';
 
 export class CreateUserDto {
   @IsEmail()
@@ -12,6 +13,7 @@ export class CreateUserDto {
     message: 'Invalid email format',
   })
   @IsNotEmpty()
+  @IsUnique({ tableName: 'users', column: 'email' })
   email: string;
 
   @IsNotEmpty()

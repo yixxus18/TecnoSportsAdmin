@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { deleted, found, notFound, saved, updated } from 'src/Utils/Responses';
+import { found, notFound, saved, updated } from 'src/Utils/Responses';
 
 const table = 'User';
 
@@ -47,7 +47,8 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(notFound(table, id));
     }
-    return deleted(table, await this.repo.remove(user));
+    await this.repo.remove(user);
+    return { message: `${table} with id ${id} has been removed` };
   }
 
   async toggleAdmin(id: number) {

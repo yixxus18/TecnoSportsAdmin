@@ -14,7 +14,7 @@ export class Team extends EntityBase {
   @Column({ default: true })
   isActive: boolean;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true })
   confederationId: number;
 
   @ManyToOne(() => Confederation, (confederation) => confederation.teams)

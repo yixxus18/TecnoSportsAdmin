@@ -5,6 +5,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import * as exphbs from 'express-handlebars';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { UnauthorizedExceptionFilter } from './auth/unauthorized-exception.filter';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -42,6 +43,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalFilters(new UnauthorizedExceptionFilter());
 
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
   await app.listen(process.env.PORT ?? 3000);
   console.log(`Application is running on: ${await app.getUrl()}`);
   console.log(`Static Assets: ${join(__dirname, '..', '..', 'public')}`);

@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { IsExists } from 'src/validations/exists.constraint';
 
 export class CreateTeamDto {
   @IsNotEmpty()
@@ -19,7 +20,8 @@ export class CreateTeamDto {
   @IsBoolean()
   isActive?: boolean;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  confederationId: number;
+  @IsExists({ tableName: 'confederations', column: 'id' })
+  confederationId?: number;
 }

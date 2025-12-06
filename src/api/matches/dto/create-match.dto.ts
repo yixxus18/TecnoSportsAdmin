@@ -4,7 +4,9 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsInt,
 } from 'class-validator';
+import { IsExists } from 'src/validations/exists.constraint';
 
 export class CreateMatchDto {
   @IsNotEmpty()
@@ -13,14 +15,16 @@ export class CreateMatchDto {
 
   @IsNotEmpty()
   @IsDateString()
-  matchDate: string;
+  matchDate: Date;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsInt()
+  @IsExists({ tableName: 'teams', column: 'id' })
   homeTeamId: number;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsInt()
+  @IsExists({ tableName: 'teams', column: 'id' })
   awayTeamId: number;
 
   @IsOptional()

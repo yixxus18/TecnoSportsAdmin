@@ -28,9 +28,9 @@ export function found(table: string, data: any) {
   };
 }
 
-export function deleted(table: string, data: any) {
+export function deleted(table: string, data: any, status: boolean) {
   return {
-    message: `${table} deletd!`,
+    message: `${table} was ${status ? 'actived' : 'deactived'}!`,
     data: data,
   };
 }

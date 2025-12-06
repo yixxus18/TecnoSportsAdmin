@@ -4,7 +4,7 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 import { Team } from './entities/team.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { found, notFound, saved, updated } from 'src/Utils/Responses';
+import { deleted, found, notFound, saved, updated } from 'src/Utils/Responses';
 
 const table = 'Team';
 
@@ -26,11 +26,23 @@ export class TeamsService {
   }
 
   async findAll() {
-    return found(`${table}s`, await this.repo.find());
+    return found(
+      `${table}s`,
+      await this.repo.find({
+        relations: {
+          confederation: true,
+        },
+      }),
+    );
   }
 
   async findOne(id: number) {
-    const team = await this.repo.findOne({ where: { id } });
+    const team = await this.repo.findOne({
+      where: { id },
+      relations: {
+        confederation: true,
+      },
+    });
     if (!team) {
       throw new NotFoundException(notFound(table, id));
     }
@@ -38,8 +50,12 @@ export class TeamsService {
   }
 
   async update(id: number, updateTeamDto: UpdateTeamDto) {
-    const team = await this.repo.findOne({ where: { id } });
-
+    const team = await this.repo.findOne({
+      where: { id },
+      relations: {
+        confederation: true,
+      },
+    });
     if (!team) {
       throw new NotFoundException(notFound(table, id));
     }
@@ -50,13 +66,16 @@ export class TeamsService {
   }
 
   async remove(id: number) {
-    const team = await this.repo.findOne({ where: { id } });
-
+    const team = await this.repo.findOne({
+      where: { id },
+      relations: {
+        confederation: true,
+      },
+    });
     if (!team) {
       throw new NotFoundException(notFound(table, id));
     }
-
-    await this.repo.remove(team);
-    return { message: `${table} with id ${id} has been removed` };
+    const status = (team.isActive = !team.isActive);
+    return deleted(table, await this.repo.save(team), status);
   }
 }
