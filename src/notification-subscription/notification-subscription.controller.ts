@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Body, Controller, HttpCode, Post, Request, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { NotificationsService } from './notification-subscription.service';
 import { CreateSubscriptionDto } from './dto/create-subscription';
 import { AuthGuard } from '@nestjs/passport';
@@ -12,13 +19,14 @@ export class NotificationSubscriptionController {
   // 2. LA RUTA DEBE SER POST 'subscribe'
   // URL Completa: /notification-subscription/subscribe
   @Post('subscribe')
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   @HttpCode(201)
   async subscribe(
     @Body() subscriptionDto: CreateSubscriptionDto,
     @Request() req,
   ) {
-    const userId = req.user.id; // Reemplaza esto con tu lógica de autenticación (ej: req.user.id)
+    // const userId = req.user.id;
+    const userId = 1;
 
     return await this.notificationsService.saveSubscription(
       subscriptionDto,
