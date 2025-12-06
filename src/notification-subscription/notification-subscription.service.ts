@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { env } from 'env';
 import { NotificationSubscription } from './entity/notification-subscription.entity';
+import { CreateSubscriptionDto } from './dto/create-subscription';
 
 @Injectable()
 export class NotificationsService {
@@ -21,6 +22,36 @@ export class NotificationsService {
       env.vapid.public_key ?? '',
       env.vapid.private_key ?? '',
     );
+  }
+
+  async saveSubscription(
+    subscriptionDto: CreateSubscriptionDto,
+    userId: number,
+  ) {
+    const { endpoint, keys } = subscriptionDto;
+
+    // 1. Intentamos encontrar una suscripción existente con el mismo endpoint
+    const existingSub = await this.subsRepo.findOne({
+      where: { endpoint },
+    });
+
+    // 2. Preparamos los datos
+    const subData = {
+      endpoint: endpoint,
+      p256dh: keys.p256dh,
+      auth: keys.auth,
+      userId: userId, // Usamos el ID del usuario
+    };
+
+    if (existingSub) {
+      // 3. Si existe, actualizamos
+      await this.subsRepo.update(existingSub.id, subData);
+      return { message: 'Subscription updated successfully.', endpoint };
+    } else {
+      // 4. Si no existe, creamos una nueva
+      await this.subsRepo.save(subData);
+      return { message: 'Subscription saved successfully.', endpoint };
+    }
   }
 
   async sendBroadcastNotification(payload: {
