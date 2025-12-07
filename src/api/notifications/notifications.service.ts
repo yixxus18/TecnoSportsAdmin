@@ -54,11 +54,10 @@ export class NotificationsService {
 
     // Use QueryBuilder to avoid relation loading issues
     const upcomingMatches = await this.matchRepository
-      .createQueryBuilder('match')
-      .select(['match.id', 'match.homeTeamId', 'match.awayTeamId', 'match.matchDate', 'match.status'])
-      .where('match."matchDate" >= :windowStart', { windowStart })
-      .andWhere('match."matchDate" <= :windowEnd', { windowEnd })
-      .andWhere('match.status = :status', { status: 'pending' })
+      .createQueryBuilder('m')
+      .where('m.matchDate >= :windowStart', { windowStart })
+      .andWhere('m.matchDate <= :windowEnd', { windowEnd })
+      .andWhere('m.status = :status', { status: 'pending' })
       .getMany();
 
     this.logger.log(`[CRON-UPCOMING] Found ${upcomingMatches.length} upcoming matches`);
@@ -88,11 +87,10 @@ export class NotificationsService {
 
     // Use QueryBuilder to avoid relation loading issues
     const startingMatches = await this.matchRepository
-      .createQueryBuilder('match')
-      .select(['match.id', 'match.homeTeamId', 'match.awayTeamId', 'match.matchDate', 'match.status'])
-      .where('match."matchDate" >= :windowStart', { windowStart })
-      .andWhere('match."matchDate" <= :windowEnd', { windowEnd })
-      .andWhere('match.status = :status', { status: 'pending' })
+      .createQueryBuilder('m')
+      .where('m.matchDate >= :windowStart', { windowStart })
+      .andWhere('m.matchDate <= :windowEnd', { windowEnd })
+      .andWhere('m.status = :status', { status: 'pending' })
       .getMany();
 
     this.logger.log(`[CRON-STARTING] Found ${startingMatches.length} starting matches`);
