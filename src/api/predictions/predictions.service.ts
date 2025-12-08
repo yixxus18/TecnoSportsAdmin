@@ -48,13 +48,15 @@ export class PredictionsService {
       throw new BadRequestException(`Pool with id ${poolId} does not exist`);
     }
 
-    // 4. Verificar que el usuario es participante de la pool
+    // 4. Verificar que el usuario es participante de la pool O es el creador
     const isParticipant = pool.participants.some(
       (participant) => participant.id === userId,
     );
-    if (!isParticipant) {
+    const isCreator = pool.creatorId === userId;
+    
+    if (!isParticipant && !isCreator) {
       throw new BadRequestException(
-        `User with id ${userId} is not a participant in pool ${poolId}`,
+        `User with id ${userId} is not a participant or creator in pool ${poolId}`,
       );
     }
 
