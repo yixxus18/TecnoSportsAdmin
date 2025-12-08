@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 import { JwtGuard } from './jwt.guard';
 import { JwtStrategy } from './jwt.strategy';
 import { SupabaseGuard } from './supabase.guard';
+import { TwoFactorService } from './two-factor.service';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { SupabaseGuard } from './supabase.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, SupabaseGuard],
-  exports: [AuthService, JwtModule],
+  providers: [AuthService, JwtStrategy, SupabaseGuard, TwoFactorService],
+  exports: [AuthService, JwtModule, TwoFactorService],
 })
 export class AuthModule {}
+

@@ -53,6 +53,14 @@
             justify-content: center;
             margin-bottom: 1rem;
         }
+        .step { display: none; }
+        .step.active { display: block; }
+        .otp-input {
+            text-align: center;
+            font-size: 2rem;
+            letter-spacing: 0.5rem;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center p-4">
@@ -68,82 +76,146 @@
 
         <!-- Tarjeta de Login -->
         <div class="login-card rounded-2xl shadow-2xl p-8">
-            <div class="text-center mb-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-2">Iniciar Sesión</h2>
-                <p class="text-gray-600">Acceso exclusivo para administradores</p>
-            </div>
-
-            <!-- Mensaje de Error -->
-            <div id="errorMessage" class="hidden mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                <i class="fas fa-exclamation-circle mr-2"></i>
-                <span id="errorText"></span>
-            </div>
-
-            <!-- Formulario de Login -->
-            <form id="loginForm">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-envelope mr-2 text-gray-500"></i>Correo Electrónico
-                    </label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        required
-                        class="input-field w-full px-4 py-3 rounded-lg focus:outline-none"
-                        placeholder="admin@tecnosports.com"
-                    >
+            <!-- Step 1: Login Form -->
+            <div id="step1" class="step active">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Iniciar Sesión</h2>
+                    <p class="text-gray-600">Acceso exclusivo para administradores</p>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-lock mr-2 text-gray-500"></i>Contraseña
-                    </label>
-                    <div class="relative">
+                <!-- Mensaje de Error -->
+                <div id="errorMessage" class="hidden mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span id="errorText"></span>
+                </div>
+
+                <!-- Formulario de Login -->
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-envelope mr-2 text-gray-500"></i>Correo Electrónico
+                        </label>
                         <input
-                            type="password"
-                            id="password"
-                            name="password"
+                            type="email"
+                            id="email"
+                            name="email"
                             required
-                            class="input-field w-full px-4 py-3 pr-12 rounded-lg focus:outline-none"
-                            placeholder="••••••••"
+                            class="input-field w-full px-4 py-3 rounded-lg focus:outline-none"
+                            placeholder="admin@tecnosports.com"
                         >
-                        <button
-                            type="button"
-                            id="togglePassword"
-                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                        >
-                            <i class="fas fa-eye"></i>
-                        </button>
                     </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-lock mr-2 text-gray-500"></i>Contraseña
+                        </label>
+                        <div class="relative">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                required
+                                class="input-field w-full px-4 py-3 pr-12 rounded-lg focus:outline-none"
+                                placeholder="••••••••"
+                            >
+                            <button
+                                type="button"
+                                id="togglePassword"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                            >
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- reCAPTCHA v2 -->
+                    <div class="recaptcha-container mb-4">
+                        <div class="g-recaptcha" data-sitekey="6Lf8YCMsAAAAAKT5nswAFx2Yq1f7N_Sh2nrW5rXe" data-callback="onRecaptchaSuccess" data-expired-callback="onRecaptchaExpired"></div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        id="loginBtn"
+                        disabled
+                        class="btn-primary w-full py-3 px-4 rounded-lg text-white font-medium focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                    >
+                        <span id="btnText">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión
+                        </span>
+                        <span id="loadingSpinner" class="loading">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>Verificando...
+                        </span>
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Solo usuarios con rol de Administrador pueden acceder
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 2: OTP Verification -->
+            <div id="step2" class="step">
+                <div class="text-center mb-6">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
+                        <i class="fas fa-shield-alt text-2xl text-green-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Verificación de Seguridad</h2>
+                    <p class="text-gray-600">Ingresa el código de 6 dígitos enviado a<br><strong id="emailDisplay"></strong></p>
                 </div>
 
-                <!-- reCAPTCHA v2 -->
-                <div class="recaptcha-container mb-4">
-                    <div class="g-recaptcha" data-sitekey="6Lf8YCMsAAAAAKT5nswAFx2Yq1f7N_Sh2nrW5rXe" data-callback="onRecaptchaSuccess" data-expired-callback="onRecaptchaExpired"></div>
+                <!-- Mensaje de Error OTP -->
+                <div id="otpErrorMessage" class="hidden mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span id="otpErrorText"></span>
                 </div>
 
-                <button
-                    type="submit"
-                    id="loginBtn"
-                    disabled
-                    class="btn-primary w-full py-3 px-4 rounded-lg text-white font-medium focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-                >
-                    <span id="btnText">
-                        <i class="fas fa-sign-in-alt mr-2"></i>Iniciar Sesión
-                    </span>
-                    <span id="loadingSpinner" class="loading">
-                        <i class="fas fa-spinner fa-spin mr-2"></i>Verificando...
-                    </span>
-                </button>
-            </form>
+                <!-- Mensaje de Éxito -->
+                <div id="otpSuccessMessage" class="hidden mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span id="otpSuccessText"></span>
+                </div>
 
-            <!-- Información adicional -->
-            <div class="mt-6 text-center">
-                <p class="text-sm text-gray-600">
-                    <i class="fas fa-info-circle mr-1"></i>
-                    Solo usuarios con rol de Administrador pueden acceder
-                </p>
+                <form id="otpForm">
+                    <div class="mb-6">
+                        <input
+                            type="text"
+                            id="otpCode"
+                            maxlength="6"
+                            pattern="[0-9]{6}"
+                            required
+                            class="otp-input input-field w-full px-4 py-4 rounded-lg focus:outline-none"
+                            placeholder="000000"
+                        >
+                    </div>
+
+                    <button
+                        type="submit"
+                        id="verifyBtn"
+                        class="btn-primary w-full py-3 px-4 rounded-lg text-white font-medium focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                    >
+                        <span id="verifyBtnText">
+                            <i class="fas fa-check mr-2"></i>Verificar Código
+                        </span>
+                        <span id="verifyLoadingSpinner" class="loading">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>Verificando...
+                        </span>
+                    </button>
+                </form>
+
+                <div class="mt-4 text-center">
+                    <button id="resendBtn" class="text-green-600 hover:text-green-700 font-medium">
+                        <i class="fas fa-redo mr-1"></i>Reenviar código
+                    </button>
+                </div>
+
+                <div class="mt-4 text-center">
+                    <button id="backBtn" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-arrow-left mr-1"></i>Volver al inicio de sesión
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -158,6 +230,7 @@
     <script>
         // reCAPTCHA callback functions
         let recaptchaVerified = false;
+        let pendingEmail = '';
 
         function onRecaptchaSuccess(token) {
             recaptchaVerified = true;
@@ -170,14 +243,28 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
             const loginForm = document.getElementById('loginForm');
+            const otpForm = document.getElementById('otpForm');
             const emailInput = document.getElementById('email');
             const passwordInput = document.getElementById('password');
+            const otpCodeInput = document.getElementById('otpCode');
             const loginBtn = document.getElementById('loginBtn');
+            const verifyBtn = document.getElementById('verifyBtn');
+            const resendBtn = document.getElementById('resendBtn');
+            const backBtn = document.getElementById('backBtn');
             const btnText = document.getElementById('btnText');
             const loadingSpinner = document.getElementById('loadingSpinner');
+            const verifyBtnText = document.getElementById('verifyBtnText');
+            const verifyLoadingSpinner = document.getElementById('verifyLoadingSpinner');
             const errorMessage = document.getElementById('errorMessage');
             const errorText = document.getElementById('errorText');
+            const otpErrorMessage = document.getElementById('otpErrorMessage');
+            const otpErrorText = document.getElementById('otpErrorText');
+            const otpSuccessMessage = document.getElementById('otpSuccessMessage');
+            const otpSuccessText = document.getElementById('otpSuccessText');
+            const emailDisplay = document.getElementById('emailDisplay');
             const togglePassword = document.getElementById('togglePassword');
 
             // Toggle password visibility
@@ -188,32 +275,54 @@
             });
 
             // Show error message
-            function showError(message) {
-                errorText.textContent = message;
-                errorMessage.classList.remove('hidden');
-                setTimeout(() => {
-                    errorMessage.classList.add('hidden');
-                }, 5000);
+            function showError(elementId, message) {
+                const el = document.getElementById(elementId);
+                const textEl = document.getElementById(elementId.replace('Message', 'Text'));
+                textEl.textContent = message;
+                el.classList.remove('hidden');
+                setTimeout(() => el.classList.add('hidden'), 5000);
+            }
+
+            function showSuccess(message) {
+                otpSuccessText.textContent = message;
+                otpSuccessMessage.classList.remove('hidden');
+                setTimeout(() => otpSuccessMessage.classList.add('hidden'), 3000);
             }
 
             // Show loading state
-            function setLoading(loading) {
+            function setLoading(btn, textEl, spinnerEl, loading) {
                 if (loading) {
-                    btnText.classList.add('hidden');
-                    loadingSpinner.classList.add('show');
-                    loginBtn.disabled = true;
-                    emailInput.disabled = true;
-                    passwordInput.disabled = true;
+                    textEl.classList.add('hidden');
+                    spinnerEl.classList.add('show');
+                    btn.disabled = true;
                 } else {
-                    btnText.classList.remove('hidden');
-                    loadingSpinner.classList.remove('show');
-                    loginBtn.disabled = !recaptchaVerified;
-                    emailInput.disabled = false;
-                    passwordInput.disabled = false;
+                    textEl.classList.remove('hidden');
+                    spinnerEl.classList.remove('show');
+                    btn.disabled = false;
                 }
             }
 
-            // Handle form submission
+            // Switch to step 2 (OTP)
+            function goToStep2(email) {
+                pendingEmail = email;
+                emailDisplay.textContent = email;
+                step1.classList.remove('active');
+                step2.classList.add('active');
+                otpCodeInput.focus();
+            }
+
+            // Switch back to step 1
+            function goToStep1() {
+                step2.classList.remove('active');
+                step1.classList.add('active');
+                otpCodeInput.value = '';
+                otpErrorMessage.classList.add('hidden');
+                otpSuccessMessage.classList.add('hidden');
+            }
+
+            backBtn.addEventListener('click', goToStep1);
+
+            // Handle login form submission
             loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
 
@@ -221,123 +330,123 @@
                 const password = passwordInput.value;
 
                 if (!email || !password) {
-                    showError('Por favor complete todos los campos');
+                    showError('errorMessage', 'Por favor complete todos los campos');
                     return;
                 }
 
-                // Check reCAPTCHA
                 if (!recaptchaVerified) {
-                    showError('Por favor complete el captcha');
+                    showError('errorMessage', 'Por favor complete el captcha');
                     return;
                 }
 
-                // Get reCAPTCHA token
-                const recaptchaToken = grecaptcha.getResponse();
-
-                setLoading(true);
+                setLoading(loginBtn, btnText, loadingSpinner, true);
 
                 try {
-                    console.log('Attempting login...');
-
-                    const response = await fetch('/auth/signin', {
+                    const response = await fetch('/auth/admin/login', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email, password, recaptchaToken }),
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password }),
                     });
 
                     const data = await response.json();
-                    console.log('Login response:', data);
 
-                    if (response.ok && data.session?.access_token) {
-                        // Store Supabase token in localStorage
-                        localStorage.setItem('authToken', data.session.access_token);
-
-                        console.log('Login successful:', data);
-
-                        // Use userProfile from response if available, otherwise use default
-                        const userProfile = data.userProfile || {
-                            id: data.user.id,
-                            email: data.user.email,
-                            name: data.user.user_metadata?.name || data.user.email.split('@')[0],
-                            roleId: 3, // Default role
-                        };
-
-                        // Store user info
-                        localStorage.setItem('user', JSON.stringify(userProfile));
-
-                        console.log('User profile stored:', userProfile);
-
-                        // Check admin role
-                        if (userProfile.roleId === 2) {
-                            console.log('Admin user, redirecting to dashboard...');
-                            showNotification('¡Bienvenido Administrador! Redirigiendo al dashboard...', 'success');
-                            setTimeout(() => {
-                                // Include token in URL for server-side authentication
-                                const token = data.session.access_token;
-                                window.location.href = `/admin/dashboard?token=${encodeURIComponent(token)}`;
-                            }, 1500);
-                        } else {
-                            console.log('User authenticated but needs admin role, redirecting to welcome page...');
-                            showNotification('¡Bienvenido! Redirigiendo...', 'success');
-                            setTimeout(() => {
-                                window.location.href = '/admin/welcome';
-                            }, 1500);
-                        }
-
+                    if (response.ok && data.requiresOTP) {
+                        // Success - go to OTP step
+                        goToStep2(email);
                     } else {
-                        const errorMsg = data.message || data.error?.message || (typeof data.error === 'string' ? data.error : null) || 'Credenciales inválidas';
-                        showError(errorMsg);
-                        // Reset reCAPTCHA on error
+                        const errorMsg = data.message || 'Credenciales inválidas';
+                        showError('errorMessage', errorMsg);
                         grecaptcha.reset();
                         recaptchaVerified = false;
                         loginBtn.disabled = true;
                     }
-
                 } catch (error) {
                     console.error('Login error:', error);
-                    showError('Error de conexión. Intente nuevamente.');
-                    // Reset reCAPTCHA on error
+                    showError('errorMessage', 'Error de conexión. Intente nuevamente.');
                     grecaptcha.reset();
                     recaptchaVerified = false;
                     loginBtn.disabled = true;
                 } finally {
-                    setLoading(false);
+                    setLoading(loginBtn, btnText, loadingSpinner, false);
+                    loginBtn.disabled = !recaptchaVerified;
                 }
             });
 
-            // Show notification function
-            function showNotification(message, type = 'info') {
-                const notification = document.createElement('div');
-                notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ${
-                    type === 'success' ? 'bg-green-500' :
-                    type === 'error' ? 'bg-red-500' : 'bg-blue-500'
-                } text-white max-w-sm`;
+            // Handle OTP verification
+            otpForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
 
-                notification.innerHTML = `
-                    <div class="flex items-center">
-                        <i class="fas ${
-                            type === 'success' ? 'fa-check-circle' :
-                            type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'
-                        } mr-2"></i>
-                        <span>${message}</span>
-                    </div>
-                `;
+                const code = otpCodeInput.value.trim();
+                if (code.length !== 6) {
+                    showError('otpErrorMessage', 'El código debe tener 6 dígitos');
+                    return;
+                }
 
-                document.body.appendChild(notification);
+                setLoading(verifyBtn, verifyBtnText, verifyLoadingSpinner, true);
 
-                setTimeout(() => {
-                    notification.classList.remove('translate-x-full');
-                }, 100);
+                try {
+                    const response = await fetch('/auth/admin/verify-otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: pendingEmail, code }),
+                    });
 
-                setTimeout(() => {
-                    notification.classList.add('translate-x-full');
-                    setTimeout(() => {
-                        document.body.removeChild(notification);
-                    }, 300);
-                }, 3000);
-            }
+                    const data = await response.json();
+
+                    if (response.ok && data.verified) {
+                        // Store session data
+                        localStorage.setItem('authToken', data.session.access_token);
+                        localStorage.setItem('user', JSON.stringify(data.userProfile));
+
+                        showSuccess('¡Verificación exitosa! Redirigiendo...');
+                        
+                        setTimeout(() => {
+                            const token = data.session.access_token;
+                            window.location.href = `/admin/dashboard?token=${encodeURIComponent(token)}`;
+                        }, 1500);
+                    } else {
+                        const errorMsg = data.message || 'Código incorrecto';
+                        showError('otpErrorMessage', errorMsg);
+                    }
+                } catch (error) {
+                    console.error('OTP error:', error);
+                    showError('otpErrorMessage', 'Error de conexión. Intente nuevamente.');
+                } finally {
+                    setLoading(verifyBtn, verifyBtnText, verifyLoadingSpinner, false);
+                }
+            });
+
+            // Handle resend OTP
+            resendBtn.addEventListener('click', async function() {
+                resendBtn.disabled = true;
+                resendBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Enviando...';
+
+                try {
+                    const response = await fetch('/auth/admin/resend-otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: pendingEmail }),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showSuccess('Nuevo código enviado');
+                    } else {
+                        showError('otpErrorMessage', data.message || 'Error al reenviar código');
+                    }
+                } catch (error) {
+                    showError('otpErrorMessage', 'Error de conexión');
+                } finally {
+                    resendBtn.disabled = false;
+                    resendBtn.innerHTML = '<i class="fas fa-redo mr-1"></i>Reenviar código';
+                }
+            });
+
+            // Only allow numbers in OTP input
+            otpCodeInput.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
 
             // Focus on email input
             emailInput.focus();

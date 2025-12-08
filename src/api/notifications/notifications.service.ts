@@ -52,21 +52,24 @@ export class NotificationsService {
     this.logger.log(`[CRON-UPCOMING] Server time: ${now.toISOString()}`);
     this.logger.log(`[CRON-UPCOMING] Checking window: ${windowStart.toISOString()} to ${windowEnd.toISOString()}`);
 
-    // Use raw SQL query to completely bypass TypeORM entity mapping
+    // Use raw SQL query with JOINs to get team names
     const upcomingMatches = await this.matchRepository.query(
-      `SELECT id, "homeTeamId", "awayTeamId", "matchDate", status 
-       FROM matches 
-       WHERE "matchDate" >= $1 AND "matchDate" <= $2 AND status = $3`,
+      `SELECT m.id, m."homeTeamId", m."awayTeamId", m."matchDate", m.status,
+              ht.name as "homeTeamName", at.name as "awayTeamName"
+       FROM matches m
+       LEFT JOIN teams ht ON m."homeTeamId" = ht.id
+       LEFT JOIN teams at ON m."awayTeamId" = at.id
+       WHERE m."matchDate" >= $1 AND m."matchDate" <= $2 AND m.status = $3`,
       [windowStart, windowEnd, 'pending']
-    ) as Array<{ id: number; homeTeamId: number; awayTeamId: number; matchDate: Date; status: string }>;
+    ) as Array<{ id: number; homeTeamId: number; awayTeamId: number; matchDate: Date; status: string; homeTeamName: string; awayTeamName: string }>;
 
     this.logger.log(`[CRON-UPCOMING] Found ${upcomingMatches.length} upcoming matches`);
 
     for (const match of upcomingMatches) {
       const matchId = match.id;
-      const homeTeamId = match.homeTeamId;
-      const awayTeamId = match.awayTeamId;
-      const matchInfo = `Equipo ${homeTeamId} vs Equipo ${awayTeamId}`;
+      const homeTeamName = match.homeTeamName || `Equipo ${match.homeTeamId}`;
+      const awayTeamName = match.awayTeamName || `Equipo ${match.awayTeamId}`;
+      const matchInfo = `${homeTeamName} vs ${awayTeamName}`;
       this.logger.log(`[CRON-UPCOMING] Processing match ${matchId}: ${matchInfo}`);
       
       await this.notifyFavoritesForMatch(
@@ -88,21 +91,24 @@ export class NotificationsService {
     this.logger.log(`[CRON-STARTING] Server time: ${now.toISOString()}`);
     this.logger.log(`[CRON-STARTING] Checking window: ${windowStart.toISOString()} to ${windowEnd.toISOString()}`);
 
-    // Use raw SQL query to completely bypass TypeORM entity mapping
+    // Use raw SQL query with JOINs to get team names
     const startingMatches = await this.matchRepository.query(
-      `SELECT id, "homeTeamId", "awayTeamId", "matchDate", status 
-       FROM matches 
-       WHERE "matchDate" >= $1 AND "matchDate" <= $2 AND status = $3`,
+      `SELECT m.id, m."homeTeamId", m."awayTeamId", m."matchDate", m.status,
+              ht.name as "homeTeamName", at.name as "awayTeamName"
+       FROM matches m
+       LEFT JOIN teams ht ON m."homeTeamId" = ht.id
+       LEFT JOIN teams at ON m."awayTeamId" = at.id
+       WHERE m."matchDate" >= $1 AND m."matchDate" <= $2 AND m.status = $3`,
       [windowStart, windowEnd, 'pending']
-    ) as Array<{ id: number; homeTeamId: number; awayTeamId: number; matchDate: Date; status: string }>;
+    ) as Array<{ id: number; homeTeamId: number; awayTeamId: number; matchDate: Date; status: string; homeTeamName: string; awayTeamName: string }>;
 
     this.logger.log(`[CRON-STARTING] Found ${startingMatches.length} starting matches`);
 
     for (const match of startingMatches) {
       const matchId = match.id;
-      const homeTeamId = match.homeTeamId;
-      const awayTeamId = match.awayTeamId;
-      const matchInfo = `Equipo ${homeTeamId} vs Equipo ${awayTeamId}`;
+      const homeTeamName = match.homeTeamName || `Equipo ${match.homeTeamId}`;
+      const awayTeamName = match.awayTeamName || `Equipo ${match.awayTeamId}`;
+      const matchInfo = `${homeTeamName} vs ${awayTeamName}`;
       this.logger.log(`[CRON-STARTING] Processing match ${matchId}: ${matchInfo}`);
       
       await this.notifyFavoritesForMatch(
